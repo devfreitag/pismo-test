@@ -1,6 +1,7 @@
 package com.devfreitag.pismotest.services.impl;
 
 import com.devfreitag.pismotest.entities.Account;
+import com.devfreitag.pismotest.exceptions.AccountConflictException;
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
 import com.devfreitag.pismotest.repositories.AccountRepository;
 import com.devfreitag.pismotest.services.AccountService;
@@ -18,6 +19,10 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public Account createAccount(String documentNumber) {
         final Account account = Account.builder().documentNumber(documentNumber).build();
+
+        if (this.accountRepository.existsByDocumentNumber(documentNumber)) {
+            throw new AccountConflictException(documentNumber);
+        }
 
         return this.accountRepository.save(account);
     }

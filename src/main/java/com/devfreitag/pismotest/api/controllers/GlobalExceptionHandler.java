@@ -1,5 +1,6 @@
 package com.devfreitag.pismotest.api.controllers;
 
+import com.devfreitag.pismotest.exceptions.AccountConflictException;
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
 import com.devfreitag.pismotest.exceptions.OperationTypeNotFoundException;
 import com.devfreitag.pismotest.models.ErrorResponse;
@@ -22,6 +23,12 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach((error) -> errors.put(error.getField(), error.getDefaultMessage()));
 
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage(), errors));
+    }
+
+    @ExceptionHandler(AccountConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(final AccountConflictException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(ex.getMessage(), Collections.emptyMap()));
     }
 
     @ExceptionHandler({AccountNotFoundException.class, OperationTypeNotFoundException.class })
