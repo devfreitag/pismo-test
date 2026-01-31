@@ -2,6 +2,7 @@ package com.devfreitag.pismotest.api.controllers;
 
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
 import com.devfreitag.pismotest.exceptions.OperationTypeNotFoundException;
+import com.devfreitag.pismotest.models.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(ex.getMessage(), Collections.emptyMap()));
     }
-
-    record ErrorResponse(String message, Map<String, String> errors) {}
 }
