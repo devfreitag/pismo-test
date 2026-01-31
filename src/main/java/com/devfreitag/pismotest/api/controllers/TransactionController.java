@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RestController
 @RequiredArgsConstructor
 public class TransactionController implements TransactionAPI {
@@ -21,12 +23,12 @@ public class TransactionController implements TransactionAPI {
     public ResponseEntity<CreateTransactionResponse> createTransaction(@RequestBody @Valid CreateTransactionRequest request) {
         final Transaction transaction = transactionService.createTransaction(request.accountId(), request.operationTypeId(), request.amount());
 
-        return ResponseEntity.ok(new CreateTransactionResponse(
-                transaction.getTransactionId(),
-                transaction.getAccount().getAccountId(),
-                transaction.getOperationType().getOperationTypeId(),
-                transaction.getAmount()
-        ));
-
+        return ResponseEntity.created(URI.create("/transactions/" + transaction.getTransactionId()))
+            .body(new CreateTransactionResponse(
+                    transaction.getTransactionId(),
+                    transaction.getAccount().getAccountId(),
+                    transaction.getOperationType().getOperationTypeId(),
+                    transaction.getAmount()
+            ));
     }
 }

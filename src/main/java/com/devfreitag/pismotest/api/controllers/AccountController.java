@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
 @RequiredArgsConstructor
 public class AccountController implements AccountAPI {
@@ -20,7 +22,8 @@ public class AccountController implements AccountAPI {
     public ResponseEntity<GetAccountResponse> createAccount(@RequestBody @Valid CreateAccountRequest request) {
         final Account account = this.accountService.createAccount(request.documentNumber());
 
-        return ResponseEntity.ok(new GetAccountResponse(account.getAccountId(), account.getDocumentNumber()));
+        return ResponseEntity.created(URI.create("/accounts/" + account.getAccountId()))
+                .body(new GetAccountResponse(account.getAccountId(), account.getDocumentNumber()));
     }
 
     @Override
