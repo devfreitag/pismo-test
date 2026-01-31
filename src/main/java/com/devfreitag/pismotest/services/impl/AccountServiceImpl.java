@@ -1,8 +1,10 @@
-package com.devfreitag.pismotest.services;
+package com.devfreitag.pismotest.services.impl;
 
 import com.devfreitag.pismotest.entities.Account;
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
 import com.devfreitag.pismotest.repositories.AccountRepository;
+import com.devfreitag.pismotest.services.AccountService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
 
     @Override
+    @Transactional
     public Account createAccount(String documentNumber) {
         final Account account = Account.builder().documentNumber(documentNumber).build();
 

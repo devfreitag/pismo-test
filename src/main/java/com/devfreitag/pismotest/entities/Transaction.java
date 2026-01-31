@@ -4,11 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +26,6 @@ public class Transaction {
     private OperationType operationType;
 
     private BigDecimal amount;
-    private LocalDateTime eventDate;
+    private Instant eventDate;
 
 }

@@ -1,7 +1,5 @@
-package com.devfreitag.pismotest.services;
+package com.devfreitag.pismotest.services.impl;
 
-import com.devfreitag.pismotest.entities.Account;
-import com.devfreitag.pismotest.entities.OperationType;
 import com.devfreitag.pismotest.entities.Transaction;
 import com.devfreitag.pismotest.enums.OperationTypeEnum;
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
@@ -9,11 +7,13 @@ import com.devfreitag.pismotest.exceptions.OperationTypeNotFoundException;
 import com.devfreitag.pismotest.repositories.AccountRepository;
 import com.devfreitag.pismotest.repositories.OperationTypeRepository;
 import com.devfreitag.pismotest.repositories.TransactionRepository;
+import com.devfreitag.pismotest.services.TransactionService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -24,14 +24,15 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     @Override
+    @Transactional
     public Transaction createTransaction(Long accountId, Long operationTypeId, BigDecimal amount) {
-        final Account account = accountRepository.findById(accountId)
+        var account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException(accountId));
 
-        final OperationType operationType = operationTypeRepository.findById(operationTypeId)
+        var operationType = operationTypeRepository.findById(operationTypeId)
                 .orElseThrow(() -> new OperationTypeNotFoundException(operationTypeId));
 
-        OperationTypeEnum operationTypeEnum = OperationTypeEnum.fromCode(operationTypeId);
+        var operationTypeEnum = OperationTypeEnum.fromCode(operationTypeId);
 
         switch (operationTypeEnum) {
             case PAYMENT:
@@ -41,11 +42,11 @@ public class TransactionServiceImpl implements TransactionService {
                 amount = amount.abs().negate();
         }
 
-        Transaction transaction = Transaction.builder()
+        var transaction = Transaction.builder()
                 .account(account)
                 .operationType(operationType)
                 .amount(amount)
-                .eventDate(LocalDateTime.now())
+                .eventDate(Instant.now())
                 .build();
 
         return transactionRepository.save(transaction);
