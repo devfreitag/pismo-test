@@ -28,7 +28,7 @@ A Spring Boot REST API for managing financial transactions and accounts. This ap
    ```
 2. Build and start the application:
    ```bash 
-   ./mvnw clean install
+   ./mvnw clean package
    docker-compose up --build
    ```
    This will:
