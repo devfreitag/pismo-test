@@ -13,6 +13,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static org.hamcrest.Matchers.hasKey;
 import static org.mockito.Mockito.when;
@@ -43,8 +44,9 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(post("/accounts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.errors").isMap())
                 .andExpect(jsonPath("$.errors", hasKey("documentNumber")))
                 .andExpect(jsonPath("$.errors.documentNumber").value("Document number is required"));
@@ -112,7 +114,7 @@ class GlobalExceptionHandlerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value("Validation failed"))
                 .andExpect(jsonPath("$.errors").isMap())
                 .andExpect(jsonPath("$.errors", hasKey("documentNumber")))
                 .andExpect(jsonPath("$.errors.documentNumber").value("Document number is required"));

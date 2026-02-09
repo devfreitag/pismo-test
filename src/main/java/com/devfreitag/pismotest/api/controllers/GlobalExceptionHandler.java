@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach((error) -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage(), errors));
+        return ResponseEntity.badRequest().body(new ErrorResponse("Validation failed", errors));
     }
 
     @ExceptionHandler(AccountConflictException.class)
