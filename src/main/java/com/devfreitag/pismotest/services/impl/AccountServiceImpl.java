@@ -9,6 +9,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
@@ -18,7 +20,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public Account createAccount(String documentNumber) {
-        final Account account = Account.builder().documentNumber(documentNumber).build();
+        final Account account = Account.builder()
+                .documentNumber(documentNumber)
+                .availableCreditLimit(BigDecimal.ZERO)
+            .build();
 
         if (this.accountRepository.existsByDocumentNumber(documentNumber)) {
             throw new AccountConflictException(documentNumber);

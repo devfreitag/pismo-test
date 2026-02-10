@@ -1,13 +1,13 @@
 package com.devfreitag.pismotest.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,4 +20,8 @@ public class Account {
 
     @Column(unique = true, nullable = false)
     private String documentNumber;
+
+    @Column(name = "available_credit_limit", nullable = false)
+    private BigDecimal availableCreditLimit;
+
 }

@@ -23,13 +23,13 @@ public class AccountController implements AccountAPI {
         final Account account = this.accountService.createAccount(request.documentNumber());
 
         return ResponseEntity.created(URI.create("/accounts/" + account.getAccountId()))
-                .body(new GetAccountResponse(account.getAccountId(), account.getDocumentNumber()));
+                .body(new GetAccountResponse(account.getAccountId(), account.getDocumentNumber(), account.getAvailableCreditLimit()));
     }
 
     @Override
     public ResponseEntity<GetAccountResponse> getAccount(@PathVariable Long accountId) {
         final Account account = this.accountService.findById(accountId);
 
-        return ResponseEntity.ok(new GetAccountResponse(account.getAccountId(), account.getDocumentNumber()));
+        return ResponseEntity.ok(new GetAccountResponse(account.getAccountId(), account.getDocumentNumber(), account.getAvailableCreditLimit()));
     }
 }
