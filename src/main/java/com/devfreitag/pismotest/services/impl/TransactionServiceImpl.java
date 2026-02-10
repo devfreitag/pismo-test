@@ -4,6 +4,7 @@ import com.devfreitag.pismotest.entities.Transaction;
 import com.devfreitag.pismotest.enums.OperationTypeEnum;
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
 import com.devfreitag.pismotest.exceptions.OperationTypeNotFoundException;
+import com.devfreitag.pismotest.exceptions.TransactionInvalidException;
 import com.devfreitag.pismotest.repositories.AccountRepository;
 import com.devfreitag.pismotest.repositories.OperationTypeRepository;
 import com.devfreitag.pismotest.repositories.TransactionRepository;
@@ -34,13 +35,24 @@ public class TransactionServiceImpl implements TransactionService {
 
         var operationTypeEnum = OperationTypeEnum.fromCode(operationTypeId);
 
-        switch (operationTypeEnum) {
-            case PAYMENT:
-                amount = amount.abs();
-                break;
-            case INSTALLMENT_PURCHASE,PURCHASE,WITHDRAWAL:
-                amount = amount.abs().negate();
+        BigDecimal creditLimit = BigDecimal.ZERO;
+        if (operationTypeEnum == OperationTypeEnum.PAYMENT) {
+            amount = amount.abs();
+
+            creditLimit = account.getAvailableCreditLimit().add(amount);
+            account.setAvailableCreditLimit(account.getAvailableCreditLimit().add(amount));
+        } else if (operationTypeEnum == OperationTypeEnum.INSTALLMENT_PURCHASE || operationTypeEnum == OperationTypeEnum.PURCHASE || operationTypeEnum == OperationTypeEnum.WITHDRAWAL) {
+            amount = amount.abs().negate();
+
+            creditLimit = account.getAvailableCreditLimit().add(amount);
         }
+
+        if (creditLimit.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new TransactionInvalidException();
+        }
+
+        account.setAvailableCreditLimit(creditLimit);
+        accountRepository.save(account);
 
         var transaction = Transaction.builder()
                 .account(account)

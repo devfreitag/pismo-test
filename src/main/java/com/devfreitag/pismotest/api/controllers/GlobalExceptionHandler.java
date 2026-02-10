@@ -3,6 +3,7 @@ package com.devfreitag.pismotest.api.controllers;
 import com.devfreitag.pismotest.exceptions.AccountConflictException;
 import com.devfreitag.pismotest.exceptions.AccountNotFoundException;
 import com.devfreitag.pismotest.exceptions.OperationTypeNotFoundException;
+import com.devfreitag.pismotest.exceptions.TransactionInvalidException;
 import com.devfreitag.pismotest.models.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(new ErrorResponse(ex.getMessage(), Collections.emptyMap()));
     }
+
+    @ExceptionHandler(TransactionInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidException(final TransactionInvalidException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
+                .body(new ErrorResponse(ex.getMessage(), Collections.emptyMap()));
+    }
+
+
 
     @ExceptionHandler({AccountNotFoundException.class, OperationTypeNotFoundException.class })
     public ResponseEntity<ErrorResponse> handleNotFound(final Exception ex) {

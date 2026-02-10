@@ -45,10 +45,11 @@ class TransactionServiceImplTest {
     private TransactionServiceImpl transactionService;
 
     // Helper methods
-    private Account buildAccount(Long accountId, String documentNumber) {
+    private Account buildAccount(Long accountId, String documentNumber, BigDecimal availableCreditLimit) {
         return Account.builder()
                 .accountId(accountId)
                 .documentNumber(documentNumber)
+                .availableCreditLimit(availableCreditLimit)
                 .build();
     }
 
@@ -60,7 +61,11 @@ class TransactionServiceImplTest {
     }
 
     private void mockAccountRepository(Long accountId, String documentNumber) {
-        Account mockAccount = buildAccount(accountId, documentNumber);
+        mockAccountRepository(accountId, documentNumber, new BigDecimal("9999999999.99"));
+    }
+
+    private void mockAccountRepository(Long accountId, String documentNumber, BigDecimal availableCreditLimit) {
+        Account mockAccount = buildAccount(accountId, documentNumber, availableCreditLimit);
         when(accountRepository.findById(accountId))
                 .thenReturn(Optional.of(mockAccount));
     }
@@ -917,6 +922,36 @@ class TransactionServiceImplTest {
                 Transaction savedTransaction = captor.getValue();
 
                 assertThat(savedTransaction.getAmount()).isEqualByComparingTo(expectedAmount);
+            }
+        }
+
+        @Nested
+        @DisplayName("Credit Limit Tests")
+        class CreditLimitTests {
+
+            @Test
+            @DisplayName("Should update account credit limit after purchase transaction")
+            void shouldUpdateAccountCreditLimitAfterPurchaseTransaction() {
+                // Arrange
+                Long accountId = 1L;
+                Long operationTypeId = 1L;
+                BigDecimal inputAmount = new BigDecimal("100.00");
+                BigDecimal initialCreditLimit = new BigDecimal("500.00");
+                BigDecimal expectedCreditLimit = new BigDecimal("400.00");
+
+                mockAccountRepository(accountId, "12345678900", initialCreditLimit);
+                mockOperationTypeRepository(operationTypeId, "PURCHASE");
+                mockTransactionRepositorySave();
+
+                // Act
+                transactionService.createTransaction(accountId, operationTypeId, inputAmount);
+
+                // Assert
+                ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
+                verify(accountRepository).save(accountCaptor.capture());
+                Account savedAccount = accountCaptor.getValue();
+
+                assertThat(savedAccount.getAvailableCreditLimit()).isEqualByComparingTo(expectedCreditLimit);
             }
         }
     }
